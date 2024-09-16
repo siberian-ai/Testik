@@ -1,0 +1,12 @@
+/* Стили для анимации значения клика */
+.click-value {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    transform: translateY(0);
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+    pointer-events: none; /* Не мешает взаимодействию с другими элементами */
+}
