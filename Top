@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clicker Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script>
+        let coinImg;
+        let balance = 0;
+        let coinsPerClick = 1;
+        let boosterActive = false;
+        let boosterEndTime = 0;
+        let boosterButton;
+        let hamsterButton;
+
+        function preload() {
+            coinImg = loadImage('https://www.google.com/url?sa=i&url=https%3A%2F%2Fzoloto-md.ru%2Fmemorable-coins%2Fp-rossiya-i-sssr%2Fp-sarskaya-rossiya%2Fzolotaya-moneta-15-rublej-nikolaya-ii&psig=AOvVaw19CkKBPq3MGZDaF10HIvo_&ust=1726603351910000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMiEiu6gyIgDFQAAAAAdAAAAABAE'); // Замените URL на путь к вашему изображению
+        }
+
+        function setup() {
+            createCanvas(800, 600);
+            boosterButton = createButton('Бустер');
+            boosterButton.position(50, 500);
+            boosterButton.mousePressed(activateBooster);
+
+            hamsterButton = createButton('Хомяк');
+            hamsterButton.position(300, 500);
+            hamsterButton.mousePressed(addHamster);
+        }
+
+        function draw() {
+            background(135, 206, 250); // Градиент можно улучшить, добавив функции
+            image(coinImg, width / 2 - coinImg.width / 2, height / 2 - coinImg.height / 2);
+
+            if (boosterActive && millis() > boosterEndTime) {
+                boosterActive = false;
+                coinsPerClick /= 2;
+            }
+
+            fill(0);
+            textSize(40);
+            text(`Баланс: ${balance}`, width - 200, 40);
+        }
+
+        function mousePressed() {
+            if (mouseX > width / 2 - coinImg.width / 2 &&
+                mouseX < width / 2 + coinImg.width / 2 &&
+                mouseY > height / 2 - coinImg.height / 2 &&
+                mouseY < height / 2 + coinImg.height / 2) {
+                balance += coinsPerClick;
+            }
+        }
+
+        function activateBooster() {
+            if (!boosterActive) {
+                boosterActive = true;
+                coinsPerClick *= 2;
+                boosterEndTime = millis() + 30000; // Бустер действует 30 секунд
+            }
+        }
+
+        function addHamster() {
+            coinsPerClick += 10;
+        }
+    </script>
+</body>
+</html>
