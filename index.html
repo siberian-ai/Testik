@@ -4,115 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clicker Game</title>
+    <link rel="stylesheet" href="style.css">
     <style>
+        /* Включаем стили прямо в HTML для удобства тестирования */
         body {
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            background: linear-gradient(to bottom, #87CEFA, #B0E0E6); /* Голубой градиент */
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
         }
-        canvas {
-            display: block;
-            margin: 0 auto;
-            background: #fff;
-            border: 1px solid #ccc;
+
+        /* Стили для игрового контейнера */
+        #game-container {
+            text-align: center;
         }
-        #buttons {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-        }
-        .button {
-            background-color: #000;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            margin-right: 10px;
+
+        /* Стили для монеты */
+        #coin {
+            width: 100px;
+            height: 100px;
+            background-color: gold;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
             cursor: pointer;
+            position: relative;
         }
-        #balance {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+
+        #coin-circle {
+            width: 100px;
+            height: 100px;
+            background-color: gold;
+            border-radius: 50%;
+        }
+
+        /* Стили для баланса */
+        #balance-container {
             font-size: 24px;
-            color: #000;
+        }
+
+        /* Стили для анимации */
+        .click-value {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            transform: translateY(0);
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <div id="buttons">
-        <button class="button" id="boosterButton">Бустер</button>
-        <button class="button" id="hamsterButton">Хомяк</button>
+    <div id="game-container">
+        <div id="coin">
+            <!-- Используйте просто круглый элемент, если нет изображения -->
+            <div id="coin-circle"></div>
+        </div>
+        <div id="balance-container">
+            <span>Balance: </span><span id="balance">0</span>
+        </div>
     </div>
-    <div id="balance">Баланс: 0</div>
-
+    <script src="script.js"></script>
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const balanceElem = document.getElementById('balance');
-        const boosterButton = document.getElementById('boosterButton');
-        const hamsterButton = document.getElementById('hamsterButton');
-
+        // Включаем JS прямо в HTML для удобства тестирования
         let balance = 0;
-        let coinsPerClick = 1;
-        let boosterActive = false;
-        let boosterEndTime = 0;
-        const circleRadius = 50;
-        const circleX = canvas.width / 2;
-        const circleY = canvas.height / 2;
+        let clickValue = 1;
+        const clickValueDisplay = document.getElementById('clickValue');
+        const balanceDisplay = document.getElementById('balance');
+        const coin = document.getElementById('coin');
 
-        function drawCircle() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Очистка холста
-            ctx.beginPath();
-            ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
-            ctx.fillStyle = '#000'; // Черный цвет для круга
-            ctx.fill();
-            ctx.closePath();
+        // Функция для обновления баланса и добавления анимации
+        function updateBalance() {
+            balance += clickValue;
+            balanceDisplay.textContent = balance;
+            animateClickValue();
         }
 
-        function drawBalance() {
-            balanceElem.textContent = `Баланс: ${balance}`;
+        // Функция для анимации значения клика
+        function animateClickValue() {
+            const clickValueElement = document.createElement('div');
+            clickValueElement.className = 'click-value';
+            clickValueElement.textContent = `+${clickValue}`;
+            document.body.appendChild(clickValueElement);
+
+            // Устанавливаем начальные и конечные позиции
+            clickValueElement.style.left = `${event.clientX}px`;
+            clickValueElement.style.top = `${event.clientY}px`;
+
+            // Запускаем анимацию
+            setTimeout(() => {
+                clickValueElement.style.transform = `translateY(-100px)`;
+                clickValueElement.style.opacity = '0';
+            }, 10);
+
+            // Удаляем элемент после завершения анимации
+            setTimeout(() => {
+                clickValueElement.remove();
+            }, 1000);
         }
 
-        function checkBooster() {
-            if (boosterActive && Date.now() > boosterEndTime) {
-                boosterActive = false;
-                coinsPerClick /= 2;
-            }
-        }
-
-        canvas.addEventListener('click', (e) => {
-            const mouseX = e.offsetX;
-            const mouseY = e.offsetY;
-            const dx = mouseX - circleX;
-            const dy = mouseY - circleY;
-            if (Math.sqrt(dx * dx + dy * dy) < circleRadius) {
-                balance += coinsPerClick;
-                drawBalance();
-            }
-        });
-
-        boosterButton.addEventListener('click', () => {
-            if (!boosterActive) {
-                boosterActive = true;
-                coinsPerClick *= 2;
-                boosterEndTime = Date.now() + 30000; // Бустер действует 30 секунд
-            }
-        });
-
-        hamsterButton.addEventListener('click', () => {
-            coinsPerClick += 10;
-        });
-
-        function gameLoop() {
-            checkBooster();
-            drawCircle();
-            requestAnimationFrame(gameLoop);
-        }
-
-        gameLoop(); // Запуск игрового цикла
+        // Обработчик клика на монету
+        coin.addEventListener('click', updateBalance);
     </script>
 </body>
 </html>
-
