@@ -4,71 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clicker Game</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
-        body { margin: 0; }
-        canvas { display: block; }
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEFA, #B0E0E6); /* Голубой градиент */
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #ccc;
+        }
+        #buttons {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+        }
+        .button {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        #balance {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: #000;
+        }
     </style>
 </head>
 <body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="buttons">
+        <button class="button" id="boosterButton">Бустер</button>
+        <button class="button" id="hamsterButton">Хомяк</button>
+    </div>
+    <div id="balance">Баланс: 0</div>
+
     <script>
-        let coinImg;
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const balanceElem = document.getElementById('balance');
+        const boosterButton = document.getElementById('boosterButton');
+        const hamsterButton = document.getElementById('hamsterButton');
+
         let balance = 0;
         let coinsPerClick = 1;
         let boosterActive = false;
         let boosterEndTime = 0;
-        let boosterButton;
-        let hamsterButton;
+        const circleRadius = 50;
+        const circleX = canvas.width / 2;
+        const circleY = canvas.height / 2;
 
-        function preload() {
-            coinImg = loadImage('https://www.google.com/url?sa=i&url=https%3A%2F%2Fzoloto-md.ru%2Fmemorable-coins%2Fp-rossiya-i-sssr%2Fp-sarskaya-rossiya%2Fzolotaya-moneta-15-rublej-nikolaya-ii&psig=AOvVaw19CkKBPq3MGZDaF10HIvo_&ust=1726603351910000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMiEiu6gyIgDFQAAAAAdAAAAABAE'); // Замените URL на путь к вашему изображению
+        function drawCircle() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Очистка холста
+            ctx.beginPath();
+            ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#000'; // Черный цвет для круга
+            ctx.fill();
+            ctx.closePath();
         }
 
-        function setup() {
-            createCanvas(800, 600);
-            boosterButton = createButton('Бустер');
-            boosterButton.position(50, 500);
-            boosterButton.mousePressed(activateBooster);
-
-            hamsterButton = createButton('Хомяк');
-            hamsterButton.position(300, 500);
-            hamsterButton.mousePressed(addHamster);
+        function drawBalance() {
+            balanceElem.textContent = `Баланс: ${balance}`;
         }
 
-        function draw() {
-            background(135, 206, 250); // Градиент можно улучшить, добавив функции
-            image(coinImg, width / 2 - coinImg.width / 2, height / 2 - coinImg.height / 2);
-
-            if (boosterActive && millis() > boosterEndTime) {
+        function checkBooster() {
+            if (boosterActive && Date.now() > boosterEndTime) {
                 boosterActive = false;
                 coinsPerClick /= 2;
             }
-
-            fill(0);
-            textSize(40);
-            text(`Баланс: ${balance}`, width - 200, 40);
         }
 
-        function mousePressed() {
-            if (mouseX > width / 2 - coinImg.width / 2 &&
-                mouseX < width / 2 + coinImg.width / 2 &&
-                mouseY > height / 2 - coinImg.height / 2 &&
-                mouseY < height / 2 + coinImg.height / 2) {
+        canvas.addEventListener('click', (e) => {
+            const mouseX = e.offsetX;
+            const mouseY = e.offsetY;
+            const dx = mouseX - circleX;
+            const dy = mouseY - circleY;
+            if (Math.sqrt(dx * dx + dy * dy) < circleRadius) {
                 balance += coinsPerClick;
+                drawBalance();
             }
-        }
+        });
 
-        function activateBooster() {
+        boosterButton.addEventListener('click', () => {
             if (!boosterActive) {
                 boosterActive = true;
                 coinsPerClick *= 2;
-                boosterEndTime = millis() + 30000; // Бустер действует 30 секунд
+                boosterEndTime = Date.now() + 30000; // Бустер действует 30 секунд
             }
+        });
+
+        hamsterButton.addEventListener('click', () => {
+            coinsPerClick += 10;
+        });
+
+        function gameLoop() {
+            checkBooster();
+            drawCircle();
+            requestAnimationFrame(gameLoop);
         }
 
-        function addHamster() {
-            coinsPerClick += 10;
-        }
+        gameLoop(); // Запуск игрового цикла
     </script>
 </body>
 </html>
+
