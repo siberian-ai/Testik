@@ -1,4 +1,47 @@
-/* Стили для анимации значения клика */
+/* Основные стили страницы */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+/* Стили для игрового контейнера */
+#game-container {
+    text-align: center;
+}
+
+/* Стили для монеты */
+#coin {
+    width: 100px;
+    height: 100px;
+    background-color: gold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto;
+    cursor: pointer;
+    position: relative;
+}
+
+#coin-circle {
+    width: 100px;
+    height: 100px;
+    background-color: gold;
+    border-radius: 50%;
+}
+
+/* Стили для баланса */
+#balance-container {
+    font-size: 24px;
+}
+
+/* Стили для анимации */
 .click-value {
     position: absolute;
     background: rgba(0, 0, 0, 0.75);
@@ -8,5 +51,5 @@
     font-size: 16px;
     transform: translateY(0);
     transition: transform 0.5s ease-out, opacity 0.5s ease-out;
-    pointer-events: none; /* Не мешает взаимодействию с другими элементами */
+    pointer-events: none;
 }
